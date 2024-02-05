@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      input[type="text"] {
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 24px;
+        padding-left: 10px;
+      }
+      .todoList {
+        font-size: 24px;
+      }
+      .deleted {
+        position: absolute;
+      }
+    </style>
+    <title>test Storage 02</title>
+  </head>
+  <body>
+    <input type="text" id="myInput" autofocus />
+    <div class="todoList">
+      <!-- <div class="todo">
+        <input type="checkbox" id="todo1" />
+        <label for="todo1">買雞蛋</label>
+      </div> -->
+    </div>
+  </body>
+
+  <script>
+    let todoAry;
+    const myInput = document.querySelector("#myInput");
+    const todoList = document.querySelector(".todoList");
+
+    let setTodo = (tempObj) => {
+      // 以下建立新增checkbox的div
+      let node = document.createElement("div");
+      node.innerHTML = `
+          <div class="todo">
+            <input type="checkbox" id="todo${tempObj.time}" />
+            <label for="todo${tempObj.time}">${tempObj.text}</label>
+          </div>
+        `;
+      todoList.append(node.children[0]);
+    };
+
+    if (localStorage.getItem("todo")) {
+      todoAry = JSON.parse(localStorage.getItem("todo"));
+      todoAry.forEach((o) => setTodo(o));
+      // 讓儲存的storage也顯示上來
+    } else {
+      todoAry = [];
+    }
+
+    myInput.addEventListener("keyup", (e) => {
+      if (e.key === "Enter" && e.ctrlKey === true) {
+        let tempObj = {};
+        tempObj.text = e.target.value;
+        tempObj.time = new Date().getTime();
+        todoAry.push(tempObj);
+        console.log(todoAry);
+        myInput.value = "";
+        localStorage.setItem("todo", JSON.stringify(todoAry));
+        setTodo(tempObj);
+      }
+    });
+
+    todoList.addEventListener("change", (e) => {
+      e.target.disabled = true;
+      // e.target = checkbox的input
+      let t = parseInt(e.target.id.slice(4), 10);
+      // t = 抓到每個扣掉todo的id
+      todoAry = todoAry.filter((o) => o.time != t);
+      // 如果time跟t相等的話=false
+      let element = e.target.closest(".todo");
+      localStorage.setItem("todo", JSON.stringify(todoAry));
+      // elem.remove();
+
+      // 下面開始是動畫
+      element.classList.add("deleted");
+      const animation = element.animate(
+        [
+          {
+            transform: `translateY(0px)`,
+            opacity: 1,
+          },
+          {
+            transform: `translateY(${window.innerHeight - 100}px)`,
+            opacity: 0,
+          },
+        ],
+        {
+          duration: 500,
+          fill: "forwards",
+          easing: "ease-in-out",
+        }
+      );
+      animation.onfinish = () => {
+        element.remove();
+      };
+    });
+  </script>
+</html>

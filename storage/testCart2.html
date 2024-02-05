@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .product {
+        display: flex;
+        margin-bottom: 10px;
+      }
+      .product .img {
+        width: 200px;
+        height: 200px;
+      }
+      .product .img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .product .name {
+        font-size: 20px;
+        padding-left: 10px;
+      }
+      .cart {
+        position: fixed;
+        right: 0;
+        bottom: 10px;
+        font-size: 24px;
+        background-color: red;
+        color: white;
+        padding: 10px;
+      }
+    </style>
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>產品頁</h1>
+    <div class="product">
+      <div class="img">
+        <img src="" alt="" />
+      </div>
+      <div class="content">
+        <h2>NAME</h2>
+        <div class="price">100</div>
+        <input type="number" value="0" name="amount" />
+        <button>+</button>
+        <br />
+        <a href="./testCart1.html">Back</a>
+      </div>
+    </div>
+    <a href="./testCart3.html">
+      <div class="cart">0</div>
+    </a>
+    <script>
+      let queryString = window.location.search;
+      let urlParams = new URLSearchParams(queryString);
+      let id = parseInt(urlParams.get("id"), 10);
+      const img = document.querySelector(".img img");
+      const divName = document.querySelector("h2");
+      const divPrice = document.querySelector(".price");
+      const addBtn = document.querySelector("button");
+      const divCart = document.querySelector(".cart");
+      let cartAry = JSON.parse(localStorage.getItem("cart"));
+      if (!cartAry) {
+        cartAry = [];
+      }
+      // localStorage.clear();
+      divCart.innerHTML = cartAry.length;
+
+      addBtn.addEventListener("click", (e) => {
+        let amount = parseInt(
+          document.querySelector("[name=amount]").value,
+          10
+        );
+        if (amount <= 0) {
+          return false;
+        }
+        // 第一種取得的方式
+        // let item = { id, amount };
+        // item = { id, amount };
+        //   cartAry.push(item);
+        //   localStorage.setItem("cart", JSON.stringify(cartAry));
+
+        // 第二種取得的方式
+        let item = cartAry.find((p) => p.id === id);
+        if (item) {
+          item.amount += amount;
+        } else {
+          // 如果沒有->新增
+          item = { id, amount };
+          cartAry.push(item);
+        }
+        console.log(cartAry);
+        divCart.innerHTML = cartAry.length;
+        localStorage.setItem("cart", JSON.stringify(cartAry));
+      });
+
+      let getData = () => {
+        return new Promise((resolve, reject) => {
+          let url = "./products.json";
+          fetch(url)
+            .then((response) => {
+              return response.json();
+            })
+            .then((result) => {
+              return resolve(result);
+            })
+            .catch((error) => {
+              console.log(error);
+              return reject(undefined);
+            });
+        });
+      };
+
+      (async () => {
+        let datas = await getData();
+        // filter&find 都可以取得產品細節頁
+        // let data1 = datas.products.filter((p) => p.id === id);
+        let data = datas.products.find((p) => p.id === id);
+        img.setAttribute("src", data.img);
+        divName.innerHTML = data.name;
+        divPrice.innerHTML = data.price;
+      })();
+    </script>
+  </body>
+</html>

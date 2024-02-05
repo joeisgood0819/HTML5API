@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="img"></div>
+    <input type="file" name="myFile" accept="image/*" />
+    <!-- 只接受圖片檔 -->
+    <script>
+      document
+        .querySelector("[name=myFile]")
+        .addEventListener("change", (e) => {
+          let file = e.target.files[0];
+          // console.log(file);
+          let reader = new FileReader();
+          reader.addEventListener("load", (e) => {
+            let image = new Image();
+            image.src = e.target.result;
+            // 來源是點擊的結果
+            let img = document.querySelector(".img");
+            img.innerHTML = "";
+            // 清空img讓之後重新上傳
+            img.append(image);
+          });
+          // 何時讀取完畢
+          reader.readAsDataURL(file);
+        });
+    </script>
+  </body>
+</html>

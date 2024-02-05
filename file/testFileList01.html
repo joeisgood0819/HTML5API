@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .myFiles {
+        display: none;
+      }
+      .container {
+        background-color: red;
+        min-height: 10px;
+      }
+    </style>
+    <title>test FileList 01</title>
+  </head>
+  <body>
+    <input type="file" class="myFiles" id="myFiles" multiple />
+    <div class="container" id="container"></div>
+    <script>
+      container.addEventListener("click", () => {
+        myFiles.click();
+      });
+      myFiles.addEventListener("change", (e) => {
+        let fileList = e.target.files; // 放到files再命名為fileList
+        [...fileList].forEach((file) => {
+          // 方法一
+          // Array.form(fileList).forEach(file => {})
+          // 方法二
+          // 轉[...fileList]為陣列的方法
+          container.innerHTML += `${file.name}<br>`;
+        });
+        // 取出陣列檔名
+      });
+    </script>
+  </body>
+</html>

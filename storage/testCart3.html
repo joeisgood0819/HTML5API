@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .pd {
+        display: flex;
+        margin-bottom: 10px;
+      }
+      .pd .sn {
+        width: 30px;
+      }
+      .pd .img {
+        width: 100px;
+        height: 100px;
+      }
+      .pd .img img {
+        width: 50%;
+        height: 50%;
+        object-fit: cover;
+      }
+      .pd .name {
+        font-size: 20px;
+        padding-left: 10px;
+      }
+      .cart {
+        position: fixed;
+        right: 0;
+        bottom: 10px;
+        font-size: 24px;
+        background-color: red;
+        color: white;
+        padding: 10px;
+      }
+      .total {
+        background-color: rgb(107, 107, 225);
+        color: white;
+        text-align: right;
+        padding-right: 20px;
+        font-size: 20px;
+      }
+      .back {
+        font-size: 14px;
+        background-color: red;
+        color: white;
+        padding-left: 10px;
+        padding-right: 10px;
+        border-radius: 4px;
+        text-decoration: none;
+      }
+      .old {
+        text-decoration: line-through;
+      }
+    </style>
+    <title>購物車內容</title>
+  </head>
+  <body>
+    <h1>
+      購物車內容 - 結帳 - <a class="back" href="./testCart1.html">回到商品列</a>
+    </h1>
+    <div class="pds">
+      <!-- <div class="pd">
+        <div class="sn">#1</div>
+        <div class="img">
+          <img
+            src="https://www.freecodecamp.org/news/content/images/2021/08/imgTag.png"
+            alt=""
+          />
+        </div>
+        <div class="name">xxx</div>
+        <div>
+          <input type="number" value="0" name="amount" />
+        </div>
+        <div>
+          <button class="btnUpdate">修改</button>
+        </div>
+        <div>
+          <button class="btnDel">刪除</button>
+        </div>
+      </div> -->
+    </div>
+    <div class="total">8888</div>
+    <h2>請選擇優惠卷</h2>
+    <div class="coupons">
+      <!-- <div class="coupon" cid="0">
+        <input type="radio" id="c0" name="coupon" checked />
+        <label for="c0">不使用優惠卷</label>
+      </div> -->
+      <!-- <div class="coupon" cid="1">
+        <input type="radio" id="c1" name="coupon" />
+        <label for="c1">全館打八折</label>
+      </div> -->
+    </div>
+    <script>
+      const divPds = document.querySelector(".pds");
+      const divTotal = document.querySelector(".total");
+      const divCoupons = document.querySelector(".coupons");
+      let data, totalMoney, couponData;
+
+      // 如果沒有找到內容設為空陣列
+      let cartAry = JSON.parse(localStorage.getItem("cart"));
+      if (!cartAry) {
+        cartAry = [];
+      }
+
+      console.log(cartAry);
+
+      let getData = () => {
+        return new Promise((resolve, reject) => {
+          let url = `./products.json`;
+          fetch(url)
+            .then((response) => {
+              return response.json();
+            })
+            .then((result) => {
+              return resolve(result);
+            })
+            .catch((error) => {
+              console.log(error);
+              return reject(undefined);
+            });
+        });
+      };
+
+      let getCData = () => {
+        return new Promise((resolve, reject) => {
+          let url = `./coupons.json`;
+          fetch(url)
+            .then((response) => {
+              return response.json();
+            })
+            .then((result) => {
+              return resolve(result);
+            })
+            .catch((error) => {
+              console.log(error);
+              return reject(undefined);
+            });
+        });
+      };
+      let initCoupon = () => {
+        divCoupons.innerHTML = `
+        <div class="coupon" cid="0">
+          <input type="radio" id="c0" name="coupon" checked />
+          <label for="c0">不使用優惠卷</label>
+        </div>
+        `;
+        couponData.forEach((item) => {
+          let node = document.createElement("div");
+          node.innerHTML = `
+            <div class="coupon" cid="${item.id}">
+              <input type="radio" id="c${item.id}" name="coupon" />
+              <!-- coupons.json的id -->
+              <label for="c${item.id}">${item.title}</label>
+              <!-- coupons.json的title -->
+            </div>
+          `;
+          divCoupons.append(node.children[0]);
+        });
+      };
+
+      let initPage = async () => {
+        datas = await getData();
+        totalMoney = 0;
+        let result = await getCData();
+        couponData = result.coupons;
+        console.log(couponData);
+        divPds.innerHTML = "";
+        cartAry.forEach((item, index) => {
+          let node = document.createElement("div");
+          let data = datas.products.find((p) => p.id === item.id);
+          // 將資料傳入
+          node.innerHTML = `
+            <div class="pd" pid="${item.id}">
+              <!-- 隱藏的id -->
+        <div class="sn">${index + 1}</div>
+        <div class="img">
+          <img
+            src="${data.img}"
+            alt=""
+          />
+        </div>
+        <div class="name">${data.name}</div>
+        <div class="price">${data.price}</div>
+        <div>
+          <input type="number" value="${item.amount}" name="amount" />
+        </div>
+        <div>
+          <button class="btnUpdate">修改</button>
+        </div>
+        <div>
+          <button class="btnDel">刪除</button>
+        </div>
+      </div>
+          `;
+          divPds.append(node.children[0]);
+          totalMoney += data.price * item.amount;
+        });
+        divTotal.innerHTML = totalMoney;
+        initCoupon();
+      };
+
+      initPage();
+      // before刪除btn可以reload page
+
+      divCoupons.addEventListener("change", (e) => {
+        let divCoupon = e.target.closest(".coupon");
+        let cid = parseInt(divCoupon.getAttribute("cid"), 10);
+        let discount;
+        if (cid === 0) {
+          discount = 1;
+          divTotal.innerHTML = totalMoney;
+        } else {
+          discount = couponData.find((i) => i.id === cid).Discount;
+          let newTotalMoney;
+          if (discount > 0) {
+            // 打折
+            newTotalMoney = totalMoney * (1 - discount);
+          } else {
+            newTotalMoney = totalMoney + discount;
+          }
+          divTotal.innerHTML = `
+            <span class="old">${totalMoney}</span> <span class="new">${newTotalMoney}</span>
+          `;
+        }
+      });
+
+      divPds.addEventListener("click", (e) => {
+        // 是否被點擊的為刪除按鈕
+        if (e.target.classList.contains("btnDel")) {
+          // console.log("!!");
+          let pd = e.target.closest(".pd");
+          let id = parseInt(pd.getAttribute("pid"), 10);
+          // console.log(id);找到不同數字
+          cartAry = cartAry.filter((i) => i.id !== id);
+          // id不相等的留下
+          localStorage.setItem("cart", JSON.stringify(cartAry));
+          // cartAry存入記憶體
+          initPage();
+          // window.location = "./testCart3.html";
+          // Reload這頁
+        } else if (e.target.classList.contains("btnUpdate")) {
+          // 修改功能
+          let pd = e.target.closest(".pd");
+          // 尋找最近的pd元素，通常為商品項目
+          let id = parseInt(pd.getAttribute("pid"), 10);
+          // 找到pd商品ID並轉為整數10進位，通常在pid可找到
+          let amount = parseInt(pd.querySelector("[name=amount]").value, 10);
+          // 同樣找到名為amount的整數pd元素
+          let cartData = cartAry.find((p) => p.id === id);
+          // cartData就是購物車中與當前商品ID匹配的項目
+          let pdData = datas.products.find((p) => p.id === id);
+          // pdData就是數據源中與當前商品ID匹配的項目
+          totalMoney = totalMoney - pdData.price * cartData.amount;
+          // 更新總金額
+          cartData.amount = amount;
+          // 更新當前購物車的amount
+          totalMoney = totalMoney + pdData.price * cartData.amount;
+          // 新的總金額
+          divTotal.innerHTML = totalMoney;
+          // 顯示頁面
+          localStorage.setItem("cart", JSON.stringify(cartAry));
+          // 將更新後的購物車數據儲存
+        }
+      });
+    </script>
+  </body>
+</html>

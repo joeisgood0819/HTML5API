@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // setCookie("username", "Joe", 30);
+      // setCookie("email", "Joe@gmail.com", 30);
+      // setCookie("tel", "979156849", 30);
+      console.log(document.cookie);
+      console.log(getCookie("username"));
+      delCookie("email");
+      console.log(getCookie("email"));
+      console.log(getCookie("tel"));
+
+      function delCookie(key) {
+        let dateNow = new Date();
+        dateNow.setDate(dateNow.getDate() - 30);
+        // -30天就會看不到內容
+        let utcString = dateNow.toUTCString();
+        document.cookie = `${key}=; expires=${utcString}; path=/`;
+      }
+
+      function setCookie(key, value, expiresDay = 1) {
+        let dateNow = new Date();
+        dateNow.setDate(dateNow.getDate() + expiresDay);
+        // -30天就會看不到內容
+        let utcString = dateNow.toUTCString();
+        document.cookie = `${key}=${value}; expires=${utcString}; path=/`;
+      }
+
+      function getCookie(name) {
+        const nameEQ = `${name}=`;
+        const ca = document.cookie.split(";").map((cookie) => cookie.trim());
+        const cookie = ca.find((cookie) => cookie.startsWith(nameEQ));
+        return cookie ? cookie.substring(nameEQ.length) : null;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>test Storage 01</title>
+  </head>
+  <body>
+    <script>
+      let storage = localStorage;
+      storage.setItem("username", "Joe Chang");
+      storage.setItem("email", "Joe@gmail.com");
+      storage.setItem("tel", "0123456789");
+      // console.log(storage.getItem("username"));
+      // storage.removeItem("username");
+      // storage.clear();
+      // 全部刪除
+      // console.log(storage.getItem("email"));
+      // console.log(storage.getItem("tel"));
+      console.log(storage.length);
+      // 是物件沒有索引值
+      // console.log(storage.getItem(storage.key(1)));
+      // storage.key只是email不是value
+      // for (let i = 0; i < storage.length; i++) {
+      //   console.log(`${storage.key(i)} = ${storage.getItem(storage.key(i))}`);
+      // }
+      // 用迴圈跑出所有key&value
+      for (let [k, v] of Object.entries(storage)) {
+        console.log(`${k} = ${v}`);
+      }
+      // 用for of迴圈更便利
+    </script>
+  </body>
+</html>
